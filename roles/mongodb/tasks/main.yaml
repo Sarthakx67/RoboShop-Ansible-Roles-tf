@@ -8,6 +8,11 @@
     src: mongodb.repo
     dest: /etc/yum.repos.d/mongo.repo
 
+- name: copy catalogue js
+  ansible.builtin.copy:
+    src: catalogue.js
+    dest: /tmp/catalogue.js
+
 - name: install mongodb
   ansible.builtin.yum: 
     name: mongodb-org
