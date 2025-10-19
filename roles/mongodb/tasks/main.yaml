@@ -23,7 +23,6 @@
     name: mongod
     state: started
     enabled: yes
-
 - name: enable remote connections to mongodb
   ansible.builtin.replace:
     path: /etc/mongod.conf
