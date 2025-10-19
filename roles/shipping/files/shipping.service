@@ -1,0 +1,14 @@
+[Unit]
+Description=Shipping Service
+
+[Service]
+User=roboshop
+Environment="CART_ENDPOINT=cart.stallions.space:8080"
+Environment="DB_HOST=mysql.stallions.space"
+Environment="DB_USER=shipping"
+Environment="DB_PASS=RoboShop@1"
+ExecStart=/usr/bin/java -jar /app/target/shipping-1.0.jar
+SyslogIdentifier=shipping
+
+[Install]
+WantedBy=multi-user.target

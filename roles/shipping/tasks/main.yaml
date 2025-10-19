@@ -1,0 +1,60 @@
+- name: Install prerequisite packages
+  ansible.builtin.yum:
+    name:
+      - epel-release
+      - maven
+      - mysql
+      - python3-PyMySQL
+      - unzip
+    state: present
+
+- name: Create Roboshop application user
+  ansible.builtin.user:
+    name: roboshop
+    system: yes
+    state: present
+
+- name: Ensure /app directory exists
+  ansible.builtin.file:
+    path: /app
+    state: directory
+    owner: roboshop
+    group: roboshop
+
+- name: Download and unpack shipping artifact
+  ansible.builtin.unarchive:
+    src: https://roboshop-builds.s3.amazonaws.com/shipping.zip
+    dest: /app
+    remote_src: yes
+    owner: roboshop
+    group: roboshop
+
+- name: Build application with Maven
+  ansible.builtin.command: mvn clean package
+  args:
+    chdir: /app
+
+- name: Create shipping systemd service file
+  ansible.builtin.copy:
+    src: shipping.service
+    dest: /etc/systemd/system/shipping.service
+
+- name: Load the application schema (creates 'cities' db)
+  ansible.builtin.shell: "mysql -h mysql.stallions.space -uroboshop -pRoboShop@1 < /app/db/schema.sql"
+  changed_when: false
+  ignore_errors: true
+
+- name: Rename the 'cities' table to 'codes' as expected by the application
+  ansible.builtin.shell: "mysql -h mysql.stallions.space -uroboshop -pRoboShop@1 cities -e 'RENAME TABLE cities TO codes;'"
+  ignore_errors: true
+  changed_when: false
+
+- name: Load the master data into the 'cities' database
+  ansible.builtin.shell: "mysql -h mysql.stallions.space -uroboshop -pRoboShop@1 cities < /app/db/master-data.sql"
+  changed_when: false
+  ignore_errors: true
+
+- name: reload/restart
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: reload-restart

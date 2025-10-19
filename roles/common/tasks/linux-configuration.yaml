@@ -1,0 +1,8 @@
+- name: install extra packages for enterprise linux
+  ansible.builtin.yum:
+    name: epel-release
+    state: installed
+- name: Set SELinux to permissive mode permanently
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
