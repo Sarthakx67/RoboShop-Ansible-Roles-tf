@@ -1,3 +1,7 @@
+- name: print app APP_VERSION
+  debug:
+    msg: "APP Version is : {{APP_VERSION}}"
+
 - name: linux configuration
   ansible.builtin.import_role:
     name: common
@@ -23,10 +27,10 @@
     src: catalogue.service
     dest: /etc/systemd/system/catalogue.service
 
-- name: load schema in mongodb
-  ansible.builtin.import_role:
-    name: common
-    tasks_from: load-schema
+# - name: load schema in mongodb
+#   ansible.builtin.import_role:
+#     name: common
+#     tasks_from: load-schema
 
 - name: reload and restart services 
   ansible.builtin.import_role:

@@ -20,10 +20,17 @@
     state: directory
   when: directory.stat.exists == false
   
-- name: Download {{component}} artifact
+# - name: Download {{component}} artifact
+#   ansible.builtin.get_url:
+#     url: https://roboshop-builds.s3.amazonaws.com/{{component}}.zip
+#     dest: /tmp
+
+- name: Download artifact from nexus
   ansible.builtin.get_url:
-    url: https://roboshop-builds.s3.amazonaws.com/{{component}}.zip
-    dest: /tmp
+    url: "{{nexus_url}}/{{component}}/{{group_id}}/{{component}}/{{APP_VERSION}}/{{component}}-{{APP_VERSION}}.zip"
+    dest: "/app/{{component}}-{{APP_VERSION}}.zip" 
+    username: "{{nexus_username}}"
+    password: "{{nexus_password}}"
 
 - name: install unzip tool
   ansible.builtin.yum:
@@ -32,6 +39,6 @@
 
 - name: unzip {{component}} artifact
   ansible.builtin.unarchive:
-    src: /tmp/{{component}}.zip
-    dest: /app
+    src: "/app/{{component}}-{{APP_VERSION}}.zip"
+    dest: "/app"
     remote_src: yes
