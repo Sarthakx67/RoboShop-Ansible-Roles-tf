@@ -1,0 +1,15 @@
+[Unit]
+Description = Catalogue Service
+
+[Service]
+User=roboshop
+Environment=MONGO=true
+#below for connection of mongodb prod and dev server with catalogue require their own address
+#so we can provide their own address using SSM parameters by giving ansible instance access to
+#read ssm role to read ssm parameters set for dev and prod mongodb servers
+Environment=MONGO_URL="mongodb://{{ lookup('amazon.aws.aws_ssm', '/roboshop/{{env}}/mongodb_url', region='ap-south-1' ) }}:27017/catalogue"
+ExecStart=/bin/node /app/server.js
+SyslogIdentifier=catalogue
+
+[Install]
+WantedBy=multi-user.target

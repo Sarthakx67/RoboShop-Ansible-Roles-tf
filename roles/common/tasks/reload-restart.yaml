@@ -7,3 +7,11 @@
     name: "{{component}}"
     state: restarted
     enabled: yes
+
+# below code will be used when we have to automatically use both prod and dev mongodb database 
+# using same ansible configuration of services
+
+# - name: copy systemd template
+#   ansible.builtin.template:
+#     src: "{{component}}.service"
+#     dest: /etc/systemd/system/{{component}}.service
